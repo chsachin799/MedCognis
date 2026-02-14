@@ -2,6 +2,8 @@
 
 The system addresses a core operational challenge in emergency and inpatient care: accurate, transparent, and real-time patient prioritization.
 
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Screenshot%202026-02-15%20025821.png)
+
 ## By combining:
 
 Machine Learning (XGBoost)
@@ -20,43 +22,39 @@ Multi-layer prioritization logic
 ## 🔍 Explainable AI (XAI)
 
 Integrated SHAP (SHapley Additive exPlanations)
-
 Feature-level transparency for every prediction
-
 Clinician-readable reasoning outputs
+
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Analysis%20diagnosis-1.png)
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Analysis%20diagnosis-2.png)
 
 ## 🩺 Diagnostic Mapping
 
 Symptom-vital correlation engine
-
 Condition prediction
-
 Specialist recommendation routing
+
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Screenshot%202026-02-15%20025859.png)
 
 ## 📊 Real-Time Command Center
 
 Glassmorphism-inspired UI
-
 ICU load tracking
-
 Department capacity visibility
-
 Vital trend radar & bar charts
 
 ## 📄 Automated EHR Parsing
 
 Heuristic PDF/Text ingestion
-
 Rapid structured data extraction
-
 In-memory preprocessing pipeline
 
 ## 🤖 Local LLM Integration
 
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Chatbot.png)
+
 Secure, on-premise clinical assistant
-
 Powered by Llama 3 via Ollama
-
 No external data transmission
 
 ## 🏗 System Architecture
@@ -66,15 +64,10 @@ MedCognis follows a decoupled, service-oriented architecture optimized for low-l
 # 1️⃣ Frontend Layer – Next.js 16
 
 Framework: Next.js (App Router)
-
 UI Styling: Tailwind CSS v4
-
 Data Visualization: Recharts
-
 Animations: Framer Motion
-
 Icons: Lucide React
-
 State Management: React hooks integrated with triage utilities
 
 # 2️⃣ Backend API Layer – FastAPI
@@ -82,9 +75,7 @@ State Management: React hooks integrated with triage utilities
 RESTful API architecture
 # Orchestration between:
 
-Frontend
-![image alt](https://github.com/Prashant44-cell/Image_classification/blob/783ab16e8749fd55f79ab22cc00d700b1074c63b/Image_classification(img1).jpeg)
-
+Frontend 
 ML models
 Database
 
@@ -135,19 +126,14 @@ source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python app.py
 
-# Backend runs at:
+# Backend as:
 
-http://localhost:8000
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Screenshot%202026-02-15%20031519.png)
 
 #🔹 Frontend Setup
 cd ..
 npm install
 npm run dev
-
-
-Frontend runs at:
-
-http://localhost:3000
 
 #🔹 Ollama Setup
 
