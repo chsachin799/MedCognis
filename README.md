@@ -19,6 +19,9 @@ XGBoost-based triage classification
 Hard-coded safety overrides (critical BP, SpO₂, HR thresholds)
 Multi-layer prioritization logic
 
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Features.png)
+
+
 ## 🔍 Explainable AI (XAI)
 
 Integrated SHAP (SHapley Additive exPlanations)
@@ -126,8 +129,6 @@ source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python app.py
 
-# Backend as:
-
 ![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Screenshot%202026-02-15%20031519.png)
 
 #🔹 Frontend Setup
@@ -135,11 +136,17 @@ cd ..
 npm install
 npm run dev
 
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Screenshot%202026-02-15%20025821.png)
+
+
 #🔹 Ollama Setup
 
 Ensure Ollama daemon is active:
 
 ollama pull llama3
+
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Ollama.png)
+
 
 Default endpoint:
 
@@ -164,10 +171,15 @@ Inspect SHAP explanations
 Review risk breakdown
 Examine recommended specialists
 
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Analysis%20diagnosis-1.png)
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Analysis%20diagnosis-2.png)
+
 4️⃣ Clinical Assistant
 
 Access Support & Help
 Interact with local LLM for structured guidance
+
+![image alt](https://github.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/blob/main/Chatbot.png)
 
 # 📂 Folder Structure
 ├── app/                 # Next.js App Router
@@ -181,14 +193,6 @@ Interact with local LLM for structured guidance
 ├── types/               # TypeScript interfaces
 └── README.md
 
-# 🔐 Security & Compliance
-
-All AI inference runs locally
-No cloud data transmission
-SQLite-based local persistence
-Role-Based Access Control
-On-premise LLM deployment
-
 ## 🔮 Future Enhancements
 
 DICOM imaging integration (MRI/CT)
@@ -199,7 +203,15 @@ Advanced anomaly detection in vitals
 
 ## 👥 Contributors
 
-Project Lead: Phoenixphones
+# Project Lead: Phoenixphones
+Clinical AI Lead: Phoenixphones
+
+Member Name: 
+
+1.Naveen (leader)
+2.Prashant gupta(frontend developer)
+3.Sachin chauhan(Synthesis Data vault generation and Research work)
+4.Bibek Kumar Sah(Resources generator and idea Creator )
 Clinical AI Lead: Phoenixphones
 
 # 📜 License
