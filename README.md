@@ -4,7 +4,7 @@
 
 The system addresses a core operational challenge in emergency and inpatient care: accurate, transparent, and real-time patient prioritization.
 
-![MedCognis Overview](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Screenshot%202026-02-15%20025821.png)
+![MedCognis Overview](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Screenshot%202026-02-15%20025821.png)
 
 ## By combining:
 
@@ -22,7 +22,18 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 - Hard-coded safety overrides (critical BP, SpO₂, HR thresholds)
 - Multi-layer prioritization logic
 
-![Features](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Features.png)
+![Features](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Features.png)
+
+## 🧠 How the AI Engine Works
+
+The core of MedCognis is its dual-layer AI engine that combines the predictive power of **XGBoost** with the clinical rigor of **Safety Overrides**.
+
+1.  **Structured Data Analysis**: The engine processes 10+ clinical parameters (Age, BP, HR, SpO₂, etc.) to identify complex risk patterns.
+2.  **Clinical Safety Overrides**: Before final scoring, the system checks for critical threshold violations (e.g., Temp > 40°C or SpO₂ < 90%) to ensure high-risk patients are never underestimated by purely statistical models.
+3.  **Real-time Explainability**: Using **SHAP**, the engine identifies exactly which features (like high Heart Rate or Age) contributed most to the risk score, providing clinicians with immediate diagnostic context.
+
+![AI Engine Input](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Analysis%20diagnosis-2.png)
+![AI Engine Results](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Analysis%20diagnosis-1.png)
 
 ## 🔍 Explainable AI (XAI)
 
@@ -30,8 +41,7 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 - Feature-level transparency for every prediction
 - Clinician-readable reasoning outputs
 
-![Analysis 1](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Analysis%20diagnosis-1.png)
-![Analysis 2](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Analysis%20diagnosis-2.png)
+![Analysis Insights](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Analysis%20diagnosis-1.png)
 
 ## 🩺 Diagnostic Mapping
 
@@ -39,7 +49,7 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 - Condition prediction
 - Specialist recommendation routing
 
-![Diagnostic Mapping](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Screenshot%202026-02-15%20025859.png)
+![Diagnostic Mapping](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Screenshot%202026-02-15%20025859.png)
 
 ## 📊 Real-Time Command Center
 
@@ -47,6 +57,8 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 - ICU load tracking
 - Department capacity visibility
 - Vital trend radar & bar charts
+
+![Dashboard](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Homepage.png)
 
 ## 📄 Automated EHR Parsing
 
@@ -56,7 +68,7 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 
 ## 🤖 Local LLM Integration
 
-![Clinical Chat](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Chatbot.png)
+![Clinical Chat](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Chatbot.png)
 
 - Secure, on-premise clinical assistant
 - Powered by Llama 3 via Ollama
@@ -66,7 +78,7 @@ MedCognis delivers interpretable, data-driven risk scoring to support faster cli
 
 MedCognis follows a decoupled, service-oriented architecture optimized for low-latency clinical operations.
 
-![Architecture Diagram](https://raw.githubusercontent.com/Prashant44-cell/MedCognis/main/MedCognis_Full_Architecture_Diagram.png)
+![Architecture Diagram](https://raw.githubusercontent.com/chsachin799/MedCognis/main/MedCognis_Full_Architecture_Diagram.png)
 
 ### 1️⃣ Frontend Layer – Next.js 16
 - **Framework**: Next.js (App Router)
@@ -126,7 +138,7 @@ source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python app.py
 ```
-![Backend Startup](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Screenshot%202026-02-15%20031519.png)
+![Backend Startup](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Screenshot%202026-02-15%20031519.png)
 
 ### 🔹 Frontend Setup
 ```bash
@@ -134,14 +146,14 @@ python app.py
 npm install
 npm run dev
 ```
-![Frontend Startup](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Screenshot%202026-02-15%20025821.png)
+![Frontend Startup](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Screenshot%202026-02-15%20025821.png)
 
 ### 🔹 Ollama Setup
 Ensure Ollama daemon is active:
 ```bash
 ollama pull llama3
 ```
-![Ollama Setup](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Ollama.png)
+![Ollama Setup](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Ollama.png)
 Default endpoint: `http://localhost:11434`
 
 ## 🧪 Usage Guide
@@ -154,18 +166,20 @@ Open: `http://localhost:3000`
 - Upload CSV / JSON / PDF
 - Trigger AI risk assessment
 
+![Patient Records](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Patient%20Records.png)
+
 3️⃣ **Analytics View**
 - Inspect SHAP explanations
 - Review risk breakdown
 - Examine recommended specialists
 
-![Analysis Views](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Analysis%20diagnosis-1.png)
+![Analysis Views](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Analysis%20diagnosis-1.png)
 
 4️⃣ **Clinical Assistant**
 - Access Support & Help
 - Interact with local LLM for structured guidance
 
-![Chatbot Interface](https://raw.githubusercontent.com/prashantvyahutwork-droid/MedCognis-Hackathon---pragyan26-/main/Chatbot.png)
+![Chatbot Interface](https://raw.githubusercontent.com/chsachin799/MedCognis/main/Chatbot.png)
 
 ## 📂 Folder Structure
 ```
