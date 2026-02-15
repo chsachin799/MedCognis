@@ -1053,7 +1053,10 @@ export default function Home() {
 }
 
 function PatientDiagnosisForm() {
+  const generateID = () => `PAT-${Math.random().toString(36).substr(2, 4).toUpperCase()}${Date.now().toString().slice(-4)}`;
+
   const [formData, setFormData] = useState({
+    Patient_ID: generateID(),
     Name: "",
     Age: 30,
     Gender: "Male",
@@ -1164,11 +1167,18 @@ function PatientDiagnosisForm() {
         </label>
       </div>
 
-      <form onSubmit={handleAnalyze} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-1 md:col-span-1">
+      <form onSubmit={handleAnalyze} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+        {/* Identity Group */}
+        <div className="md:col-span-2 lg:col-span-1 space-y-1">
+          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Patient ID</label>
+          <input type="text" readOnly value={formData.Patient_ID} className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-sm text-medical-brand font-mono cursor-not-allowed" />
+        </div>
+        <div className="md:col-span-2 lg:col-span-2 space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Patient Name</label>
           <input type="text" placeholder="Full Name" required value={formData.Name || ""} onChange={(e) => setFormData({ ...formData, Name: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
+
+        {/* Basic Info */}
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Age</label>
           <input type="number" min="0" max="120" value={formData.Age || ""} onChange={(e) => setFormData({ ...formData, Age: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
@@ -1180,25 +1190,22 @@ function PatientDiagnosisForm() {
             <option value="Female">Female</option>
           </select>
         </div>
-        <div className="space-y-1 md:col-span-2">
-          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Primary Symptom</label>
-          <select value={formData.Symptoms} onChange={(e) => setFormData({ ...formData, Symptoms: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
-            <option value="Chest Pain">Chest Pain</option>
-            <option value="Fever">Fever</option>
-            <option value="Cough">Cough</option>
-            <option value="Numbness">Numbness</option>
-            <option value="Abdominal Pain">Abdominal Pain</option>
-            <option value="Headache">Headache</option>
-            <option value="Breathlessness">Breathlessness</option>
-            <option value="Vomiting">Vomiting</option>
+        <div className="space-y-1">
+          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Consciousness</label>
+          <select value={formData.Consciousness} onChange={(e) => setFormData({ ...formData, Consciousness: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
+            <option value="Alert">Alert</option>
+            <option value="Confused">Confused</option>
+            <option value="Unresponsive">Unresponsive</option>
           </select>
         </div>
+
+        {/* Vitals Group */}
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Systolic BP</label>
           <input type="number" min="50" max="250" value={formData.Blood_Pressure || ""} onChange={(e) => setFormData({ ...formData, Blood_Pressure: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Heart Rate</label>
+          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Heart Rate (BPM)</label>
           <input type="number" min="30" max="300" value={formData.Heart_Rate || ""} onChange={(e) => setFormData({ ...formData, Heart_Rate: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
@@ -1210,19 +1217,26 @@ function PatientDiagnosisForm() {
           <input type="number" min="0" max="100" value={formData.O2_Saturation || ""} onChange={(e) => setFormData({ ...formData, O2_Saturation: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Pain (0-10)</label>
+          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Pain Scale (0-10)</label>
           <input type="number" min="0" max="10" value={formData.Pain_Severity === 0 ? "0" : formData.Pain_Severity || ""} onChange={(e) => setFormData({ ...formData, Pain_Severity: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
-        <div className="space-y-1">
-          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Consciousness</label>
-          <select value={formData.Consciousness} onChange={(e) => setFormData({ ...formData, Consciousness: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
-            <option value="Alert">Alert</option>
-            <option value="Confused">Confused</option>
-            <option value="Unresponsive">Unresponsive</option>
+
+        {/* Symptoms & Conditions */}
+        <div className="md:col-span-2 lg:col-span-3 space-y-1">
+          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Primary Patient Symptom</label>
+          <select value={formData.Symptoms} onChange={(e) => setFormData({ ...formData, Symptoms: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
+            <option value="Chest Pain">Chest Pain</option>
+            <option value="Fever">Fever</option>
+            <option value="Cough">Cough</option>
+            <option value="Numbness">Numbness</option>
+            <option value="Abdominal Pain">Abdominal Pain</option>
+            <option value="Headache">Headache</option>
+            <option value="Breathlessness">Breathlessness</option>
+            <option value="Vomiting">Vomiting</option>
           </select>
         </div>
-        <div className="md:col-span-2 pt-4 flex gap-3">
-          <button type="button" onClick={() => setFormData({ Name: "", Age: 30, Gender: "Male", Symptoms: "Fever", Blood_Pressure: 120, Heart_Rate: 80, Temperature: 37.0, O2_Saturation: 98, Pain_Severity: 2, Consciousness: "Alert", Pre_Existing_Conditions: "None" })} className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
+        <div className="md:col-span-2 lg:col-span-3 pt-6 flex gap-3">
+          <button type="button" onClick={() => setFormData({ Patient_ID: generateID(), Name: "", Age: 30, Gender: "Male", Symptoms: "Fever", Blood_Pressure: 120, Heart_Rate: 80, Temperature: 37.0, O2_Saturation: 98, Pain_Severity: 2, Consciousness: "Alert", Pre_Existing_Conditions: "None" })} className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
             Reset
           </button>
           <button type="submit" disabled={loading} className="flex-1 py-3 bg-medical-brand text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">

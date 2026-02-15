@@ -118,6 +118,7 @@ async def health_check():
 from pydantic import BaseModel, Field
 
 class PatientData(BaseModel):
+    Patient_ID: str = Field(None, description="Unique Patient ID (will be generated if not provided)")
     Name: str = Field(..., description="Patient Name")
     Age: int = Field(..., ge=0, le=120, description="Age must be between 0 and 120")
     Gender: str
@@ -145,11 +146,12 @@ async def predict_risk(data: PatientData):
     # Convert Pydantic model to dict
     input_data = data.dict()
     
+    # Use provided Patient_ID or Generate System ID (e.g., PAT-8F2A)
+    if not input_data.get('Patient_ID'):
+        input_data['Patient_ID'] = f"PAT-{str(uuid.uuid4())[:8].upper()}"
+    
     # Get Prediction from Engine
     result = engine.predict_patient(input_data)
-    # Generate System ID (e.g., PAT-8F2A)
-    generated_id = f"PAT-{str(uuid.uuid4())[:8].upper()}"
-    input_data['Patient_ID'] = generated_id
         
     # Save to Database
     try:
