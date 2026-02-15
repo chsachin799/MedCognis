@@ -1,5 +1,6 @@
 # MedCognis Health
 
+
 ## MedCognis Health is a high-performance clinical triage and command center platform engineered for modern healthcare environments.
 
 The system addresses a core operational challenge in emergency and inpatient care: accurate, transparent, and real-time patient prioritization.
