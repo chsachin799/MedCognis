@@ -1054,7 +1054,6 @@ export default function Home() {
 
 function PatientDiagnosisForm() {
   const [formData, setFormData] = useState({
-    Patient_ID: "",
     Name: "",
     Age: 30,
     Gender: "Male",
@@ -1166,11 +1165,7 @@ function PatientDiagnosisForm() {
       </div>
 
       <form onSubmit={handleAnalyze} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-1">
-          <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Patient ID</label>
-          <input type="text" placeholder="Unique ID (e.g. PAT-001)" required value={formData.Patient_ID || ""} onChange={(e) => setFormData({ ...formData, Patient_ID: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
-        </div>
-        <div className="space-y-1">
+        <div className="space-y-1 md:col-span-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Patient Name</label>
           <input type="text" placeholder="Full Name" required value={formData.Name || ""} onChange={(e) => setFormData({ ...formData, Name: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
@@ -1227,7 +1222,7 @@ function PatientDiagnosisForm() {
           </select>
         </div>
         <div className="md:col-span-2 pt-4 flex gap-3">
-          <button type="button" onClick={() => setFormData({ Patient_ID: "", Name: "", Age: 30, Gender: "Male", Symptoms: "Fever", Blood_Pressure: 120, Heart_Rate: 80, Temperature: 37.0, O2_Saturation: 98, Pain_Severity: 2, Consciousness: "Alert", Pre_Existing_Conditions: "None" })} className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
+          <button type="button" onClick={() => setFormData({ Name: "", Age: 30, Gender: "Male", Symptoms: "Fever", Blood_Pressure: 120, Heart_Rate: 80, Temperature: 37.0, O2_Saturation: 98, Pain_Severity: 2, Consciousness: "Alert", Pre_Existing_Conditions: "None" })} className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
             Reset
           </button>
           <button type="submit" disabled={loading} className="flex-1 py-3 bg-medical-brand text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
@@ -1241,7 +1236,9 @@ function PatientDiagnosisForm() {
         <div className="p-4 rounded-xl bg-medical-brand/10 border border-medical-brand/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-medical-brand mb-1">Risk Assessment</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-medical-brand mb-1">
+                Risk Assessment - <span className="text-white/70 italic">{result.Patient_ID}</span>
+              </p>
               <h4 className={cn("text-2xl font-black",
                 result.risk_level === "High" ? "text-medical-critical" :
                   result.risk_level === "Medium" ? "text-medical-warning" : "text-medical-success"

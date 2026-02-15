@@ -10,6 +10,8 @@ import io
 import re
 from pypdf import PdfReader
 import requests
+import uuid
+import datetime
 
 
 import sqlite3
@@ -116,7 +118,6 @@ async def health_check():
 from pydantic import BaseModel, Field
 
 class PatientData(BaseModel):
-    Patient_ID: str = Field(..., description="Unique Patient ID")
     Name: str = Field(..., description="Patient Name")
     Age: int = Field(..., ge=0, le=120, description="Age must be between 0 and 120")
     Gender: str
@@ -146,8 +147,9 @@ async def predict_risk(data: PatientData):
     
     # Get Prediction from Engine
     result = engine.predict_patient(input_data)
-    if result.get("status") == "error":
-        raise HTTPException(status_code=400, detail=result.get("message"))
+    # Generate System ID (e.g., PAT-8F2A)
+    generated_id = f"PAT-{str(uuid.uuid4())[:8].upper()}"
+    input_data['Patient_ID'] = generated_id
         
     # Save to Database
     try:
