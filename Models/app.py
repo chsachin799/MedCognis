@@ -99,15 +99,17 @@ async def health_check():
 
 
 
+from pydantic import BaseModel, Field
+
 class PatientData(BaseModel):
-    Age: int
+    Age: int = Field(..., ge=0, le=120, description="Age must be between 0 and 120")
     Gender: str
     Symptoms: str
-    Blood_Pressure: int
-    Heart_Rate: int
-    Temperature: float
-    O2_Saturation: int
-    Pain_Severity: int
+    Blood_Pressure: int = Field(..., ge=50, le=250, description="Syastolic BP must be between 50 and 250")
+    Heart_Rate: int = Field(..., ge=30, le=300, description="Heart Rate must be between 30 and 300")
+    Temperature: float = Field(..., ge=25.0, le=45.0, description="Temperature must be between 25.0 and 45.0")
+    O2_Saturation: int = Field(..., ge=0, le=100, description="O2 Saturation must be between 0 and 100")
+    Pain_Severity: int = Field(..., ge=0, le=10, description="Pain Severity must be between 0 and 10")
     Consciousness: str
     Pre_Existing_Conditions: str
     user_id: int = None  # Optional, links to registered user

@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Bell, LayoutDashboard, Menu, Settings, Users, Upload, FileText, BarChart3, Heart, Shield, Zap, ChevronRight, AlertTriangle, CheckCircle, Moon, Sun, Mail, Smartphone, BellRing, HelpCircle, Calendar, Send, MessageSquare, Phone, Clock, ExternalLink, RefreshCw } from "lucide-react";
+import { Activity, Bell, LayoutDashboard, Menu, Settings, Users, Upload, FileText, BarChart3, Heart, Shield, Zap, ChevronRight, AlertTriangle, CheckCircle, Moon, Sun, Mail, Smartphone, BellRing, HelpCircle, Calendar, Send, MessageSquare, Phone, Clock, ExternalLink, RefreshCw, UploadCloud } from "lucide-react";
 import StatsPanel from "@/components/StatsPanel";
 import TriageDashboard from "@/components/TriageDashboard";
 import ScrollFrameSequence from "@/components/ScrollFrameSequence";
@@ -932,28 +932,23 @@ export default function Home() {
           )}
           {/* ═══════════ TRAINING & ANALYSIS VIEW ═══════════ */}
           {activeView === "analysis" && (
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-4xl mx-auto">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold flex items-center gap-2">
                     <Zap className="text-medical-brand" /> Training & Analysis
                   </h2>
-                  <p className="text-sm opacity-60 mt-1">Directly analyze patient conditions or retrain the AI models with custom data.</p>
+                  <p className="text-sm opacity-60 mt-1">Directly analyze patient conditions or upload EHR documents for auto-fill.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {/* Manual Analysis Form */}
-                <div className="glass-panel p-6">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Activity size={18} className="text-medical-brand" /> Manual Diagnosis
+                <div className="glass-panel p-8">
+                  <h3 className="text-lg font-semibold mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
+                    <Activity size={18} className="text-medical-brand" /> Clinical Diagnosis Support
                   </h3>
                   <PatientDiagnosisForm />
-                </div>
-
-                {/* Medical Report Analysis Module */}
-                <div className="lg:col-span-2">
-                  <ReportAnalysisModule />
                 </div>
               </div>
             </div>
@@ -1072,20 +1067,37 @@ function PatientDiagnosisForm() {
   });
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
+    setSuccess(null);
+    setResult(null);
+
     try {
       const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+
       const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 422) {
+          const detail = data.detail?.[0];
+          throw new Error(detail ? `${detail.loc?.[1] || 'Field'}: ${detail.msg}` : "Validation failed. Check inputs.");
+        }
+        throw new Error(data.message || "Failed to analyze patient data.");
+      }
+
       setResult(data);
-    } catch (err) {
-      alert("Failed to connect to backend for analysis.");
+      setSuccess("Analysis complete successfully.");
+    } catch (err: any) {
+      setError(err.message || "Failed to connect to backend.");
     } finally {
       setLoading(false);
     }
@@ -1093,21 +1105,77 @@ function PatientDiagnosisForm() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleAnalyze} className="grid grid-cols-2 gap-4">
+      {/* Status Messages */}
+      {error && (
+        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
+      {success && (
+        <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <CheckCircle size={16} />
+          <span>{success}</span>
+        </div>
+      )}
+
+      <div className="mb-6 p-4 border border-dashed border-white/20 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+        <label className="flex flex-col items-center justify-center cursor-pointer gap-2">
+          <UploadCloud className="text-medical-brand" size={24} />
+          <span className="text-sm font-medium">Upload EHR/EMR Document</span>
+          <span className="text-xs opacity-50">Auto-fill form from PDF or Text</span>
+          <input
+            type="file"
+            accept=".pdf,.txt,.csv"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+
+              setError(null);
+              setSuccess(null);
+              const formDataUpload = new FormData();
+              formDataUpload.append("file", file);
+
+              try {
+                const res = await fetch(`${API_BASE}/parse_ehr`, {
+                  method: "POST",
+                  body: formDataUpload
+                });
+                const data = await res.json();
+
+                if (res.ok && data.status === "success" && data.data) {
+                  setFormData(prev => ({
+                    ...prev,
+                    ...data.data
+                  }));
+                  setSuccess("Document parsed and form auto-filled!");
+                } else {
+                  throw new Error(data.message || "Could not parse document.");
+                }
+              } catch (err: any) {
+                setError(err.message || "Error uploading document.");
+              }
+            }}
+          />
+        </label>
+      </div>
+
+      <form onSubmit={handleAnalyze} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Age</label>
-          <input type="number" value={formData.Age || ""} onChange={(e) => setFormData({ ...formData, Age: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" min="0" max="120" value={formData.Age || ""} onChange={(e) => setFormData({ ...formData, Age: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Gender</label>
-          <select value={formData.Gender} onChange={(e) => setFormData({ ...formData, Gender: e.target.value })} className="w-full px-4 py-2 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
+          <select value={formData.Gender} onChange={(e) => setFormData({ ...formData, Gender: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
         </div>
-        <div className="space-y-1 col-span-2">
+        <div className="space-y-1 md:col-span-2">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Primary Symptom</label>
-          <select value={formData.Symptoms} onChange={(e) => setFormData({ ...formData, Symptoms: e.target.value })} className="w-full px-4 py-2 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
+          <select value={formData.Symptoms} onChange={(e) => setFormData({ ...formData, Symptoms: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
             <option value="Chest Pain">Chest Pain</option>
             <option value="Fever">Fever</option>
             <option value="Cough">Cough</option>
@@ -1120,35 +1188,41 @@ function PatientDiagnosisForm() {
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Systolic BP</label>
-          <input type="number" value={formData.Blood_Pressure || ""} onChange={(e) => setFormData({ ...formData, Blood_Pressure: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" min="50" max="250" value={formData.Blood_Pressure || ""} onChange={(e) => setFormData({ ...formData, Blood_Pressure: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Heart Rate</label>
-          <input type="number" value={formData.Heart_Rate || ""} onChange={(e) => setFormData({ ...formData, Heart_Rate: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" min="30" max="300" value={formData.Heart_Rate || ""} onChange={(e) => setFormData({ ...formData, Heart_Rate: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Temp (°C)</label>
-          <input type="number" step="0.1" value={formData.Temperature || ""} onChange={(e) => setFormData({ ...formData, Temperature: e.target.value === "" ? 0 : parseFloat(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" step="0.1" min="25" max="45" value={formData.Temperature || ""} onChange={(e) => setFormData({ ...formData, Temperature: e.target.value === "" ? 0 : parseFloat(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">SpO2 (%)</label>
-          <input type="number" value={formData.O2_Saturation || ""} onChange={(e) => setFormData({ ...formData, O2_Saturation: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" min="0" max="100" value={formData.O2_Saturation || ""} onChange={(e) => setFormData({ ...formData, O2_Saturation: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Pain (0-10)</label>
-          <input type="number" min="0" max="10" value={formData.Pain_Severity === 0 ? "0" : formData.Pain_Severity || ""} onChange={(e) => setFormData({ ...formData, Pain_Severity: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
+          <input type="number" min="0" max="10" value={formData.Pain_Severity === 0 ? "0" : formData.Pain_Severity || ""} onChange={(e) => setFormData({ ...formData, Pain_Severity: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors" />
         </div>
         <div className="space-y-1">
           <label className="text-xs font-semibold opacity-50 uppercase tracking-wider">Consciousness</label>
-          <select value={formData.Consciousness} onChange={(e) => setFormData({ ...formData, Consciousness: e.target.value })} className="w-full px-4 py-2 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
+          <select value={formData.Consciousness} onChange={(e) => setFormData({ ...formData, Consciousness: e.target.value })} className="w-full px-4 py-3 bg-white text-black border border-white/20 rounded-lg text-sm focus:outline-none focus:border-medical-brand transition-colors">
             <option value="Alert">Alert</option>
             <option value="Confused">Confused</option>
             <option value="Unresponsive">Unresponsive</option>
           </select>
         </div>
-        <button type="submit" disabled={loading} className="col-span-2 py-3 bg-medical-brand text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 mt-2">
-          {loading ? "Analyzing..." : "Analyze Patient Condition"}
-        </button>
+        <div className="md:col-span-2 pt-4 flex gap-3">
+          <button type="button" onClick={() => setFormData({ Age: 30, Gender: "Male", Symptoms: "Fever", Blood_Pressure: 120, Heart_Rate: 80, Temperature: 37.0, O2_Saturation: 98, Pain_Severity: 2, Consciousness: "Alert", Pre_Existing_Conditions: "None" })} className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">
+            Reset
+          </button>
+          <button type="submit" disabled={loading} className="flex-1 py-3 bg-medical-brand text-white rounded-xl font-bold hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+            {loading ? <RefreshCw className="animate-spin" size={18} /> : <Zap size={18} />}
+            {loading ? "Analyzing..." : "Analyze Patient Condition"}
+          </button>
+        </div>
       </form>
 
       {result && (
@@ -1239,163 +1313,7 @@ function ToggleRow({ icon, label, description, checked, onChange, darkMode = tru
   );
 }
 
-function ReportAnalysisModule() {
-  const [reportData, setReportData] = useState({ name: "", age: 30, gender: "Male", report: "" });
-  const [analysis, setAnalysis] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
 
-  const handleAnalyze = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSaved(false);
-    try {
-      const res = await fetch(`${API_BASE}/analyze-report`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reportData),
-      });
-      const data = await res.json();
-      if (data.status === "success") setAnalysis(data.analysis);
-    } catch (err) {
-      alert("Failed to analyze report.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSave = async () => {
-    if (!analysis) return;
-    try {
-      const res = await fetch(`${API_BASE}/save-diagnosis`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: analysis.name,
-          summary: analysis.summary,
-          timestamp: new Date().toISOString()
-        }),
-      });
-      const data = await res.json();
-      if (data.status === "success") setSaved(true);
-    } catch (err) {
-      alert("Failed to save diagnosis.");
-    }
-  };
-
-  return (
-    <div className="glass-panel p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold flex items-center gap-2">
-          <FileText className="text-medical-brand" /> Medical Report Analysis
-        </h3>
-        {analysis && (
-          <button onClick={() => setAnalysis(null)} className="text-xs text-medical-brand hover:underline">New Analysis</button>
-        )}
-      </div>
-
-      {!analysis ? (
-        <form onSubmit={handleAnalyze} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input type="text" placeholder="Patient Name" value={reportData.name} onChange={e => setReportData({ ...reportData, name: e.target.value })} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:border-medical-brand outline-none" required />
-            <input type="number" placeholder="Age" value={reportData.age || ""} onChange={e => setReportData({ ...reportData, age: e.target.value === "" ? 0 : parseInt(e.target.value) })} className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm focus:border-medical-brand outline-none" required />
-            <select value={reportData.gender} onChange={e => setReportData({ ...reportData, gender: e.target.value })} className="bg-white text-black border border-white/20 rounded-lg px-4 py-2 text-sm focus:border-medical-brand outline-none">
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <textarea
-            placeholder="Paste medical report or clinical notes here... (e.g., Patient reports chest pain and fever for 2 days. Heart rate elevated.)"
-            value={reportData.report}
-            onChange={e => setReportData({ ...reportData, report: e.target.value })}
-            className="w-full h-40 bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-medical-brand outline-none resize-none"
-            required
-          />
-          <button type="submit" disabled={loading} className="w-full bg-medical-brand text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-            {loading ? <RefreshCw className="animate-spin" size={18} /> : <Zap size={18} />}
-            Analyze Report
-          </button>
-        </form>
-      ) : (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Summary Stats */}
-            <div className="lg:col-span-1 space-y-4">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-xs opacity-50 uppercase tracking-widest mb-1">Patient Name</p>
-                <p className="text-lg font-bold">{analysis.name}</p>
-              </div>
-              <div className={cn("p-4 rounded-xl border",
-                analysis.risk_level === "High" ? "bg-medical-critical/10 border-medical-critical/20" :
-                  analysis.risk_level === "Medium" ? "bg-medical-warning/10 border-medical-warning/20" :
-                    "bg-medical-success/10 border-medical-success/20"
-              )}>
-                <p className="text-xs opacity-50 uppercase tracking-widest mb-1">Risk Level</p>
-                <p className={cn("text-lg font-bold",
-                  analysis.risk_level === "High" ? "text-medical-critical" :
-                    analysis.risk_level === "Medium" ? "text-medical-warning" :
-                      "text-medical-success"
-                )}>{analysis.risk_level} ({analysis.risk_score}/100)</p>
-              </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-xs opacity-50 uppercase tracking-widest mb-1">Recommended Specialist</p>
-                <p className="text-lg font-bold text-medical-brand">{analysis.recommended_specialist}</p>
-              </div>
-            </div>
-
-            {/* AI Insights & Visuals */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <h4 className="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Clinical Insights</h4>
-                <p className="text-sm leading-relaxed mb-4">{analysis.summary}</p>
-                <div className="flex flex-wrap gap-2">
-                  {analysis.symptoms.map((s: string) => (
-                    <span key={s} className="px-2 py-1 bg-medical-brand/10 border border-medical-brand/20 rounded-md text-xs text-medical-brand font-medium">{s}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Vitals Graph */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10 h-64">
-                <h4 className="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Predicted Vitals Trends</h4>
-                <ResponsiveContainer width="100%" height="85%">
-                  <AreaChart data={analysis.chartData}>
-                    <defs>
-                      <linearGradient id="colorHr" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                    <XAxis dataKey="time" stroke="#ffffff40" fontSize={10} axisLine={false} tickLine={false} />
-                    <YAxis stroke="#ffffff40" fontSize={10} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ background: "#0f172a", border: "1px solid #ffffff10", borderRadius: "8px" }} />
-                    <Area type="monotone" dataKey="hr" stroke="#3b82f6" fillOpacity={1} fill="url(#colorHr)" />
-                    <Area type="monotone" dataKey="temp" stroke="#f43f5e" fillOpacity={0} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button onClick={handleSave} disabled={saved} className={cn(
-              "flex-1 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
-              saved ? "bg-medical-success/20 text-medical-success" : "bg-medical-brand text-white hover:bg-blue-700"
-            )}>
-              {saved ? <CheckCircle size={20} /> : <Shield size={20} />}
-              {saved ? "Saved to Records" : "Confirm & Save Diagnosis"}
-            </button>
-            <div className="text-xs opacity-40 italic">
-              *Analysis generated at {new Date().toLocaleTimeString()}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function ChatAssistant({ isOpen, onClose, messages, onSendMessage }: {
   isOpen: boolean;

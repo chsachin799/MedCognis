@@ -1,0 +1,3 @@
+Age,Gender,Symptoms,Blood_Pressure,Heart_Rate,Temperature,O2_Saturation,Pain_Severity,Consciousness,Pre_Existing_Conditions,Risk_Level
+30,Male,Fever,120,80,37.0,98,2,Alert,None,Low
+60,Female,Chest Pain,160,110,38.5,92,9,Confused,Diabetes,High
